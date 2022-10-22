@@ -1,0 +1,28 @@
+{
+  "name": "@tomfrench/noir-template",
+  "description": "Template for starting Noir projects",
+  "homepage": "https://github.com/tomafrench/noir-template#readme",
+  "repository": "git@github.com:tomafrench/noir-template.git",
+  "scripts": {
+    "nargo": "cd circuits; nargo",
+    "lint": "eslint .",
+    "test": "mocha --extension test.ts -r ts-node/register --recursive"
+  },
+  "devDependencies": {
+    "@noir-lang/aztec_backend": "^0.11.0",
+    "@noir-lang/barretenberg": "^2.19.0",
+    "@noir-lang/noir_wasm": "^0.10.0",
+    "@types/chai": "^4.3.3",
+    "@types/mocha": "^10.0.0",
+    "@types/node": "^18.8.3",
+    "@typescript-eslint/eslint-plugin": "^5.39.0",
+    "@typescript-eslint/parser": "^5.39.0",
+    "chai": "^4.3.6",
+    "eslint": "^8.24.0",
+    "eslint-plugin-prettier": "^4.2.1",
+    "mocha": "^10.0.0",
+    "prettier": "^2.7.1",
+    "ts-node": "^10.9.1",
+    "typescript": "^4.8.4"
+  }
+}

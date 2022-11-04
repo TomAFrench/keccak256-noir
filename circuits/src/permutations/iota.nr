@@ -1,6 +1,6 @@
-const STATE_SIZE: Field = 1600;
-const LANE_LENGTH: Field = 64;
-const NUM_ROUNDS: Field = 24;
+global STATE_SIZE: Field = 1600;
+global LANE_LENGTH: Field = 64;
+global NUM_ROUNDS: Field = 24;
 
 fn iota(state: [u1; STATE_SIZE], round_number: Field) -> [u1; STATE_SIZE] {
   // Each element of RC is a bitmap for the mask to apply to the lane.

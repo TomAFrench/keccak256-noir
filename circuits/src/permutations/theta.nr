@@ -1,5 +1,5 @@
-const STATE_SIZE: Field = 1600;
-const LANE_LENGTH: Field = 64;
+global STATE_SIZE: Field = 1600;
+global LANE_LENGTH: Field = 64;
 
 fn theta(state: [u1; STATE_SIZE]) -> [u1; STATE_SIZE] {
     // The theta function works by calculating the parity of each of the columns in the state array. We store these

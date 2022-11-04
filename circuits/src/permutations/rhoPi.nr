@@ -1,5 +1,5 @@
-const STATE_SIZE: Field = 1600;
-const LANE_LENGTH: Field = 64;
+global STATE_SIZE: Field = 1600;
+global LANE_LENGTH: Field = 64;
 
 // This function is a combination of the rho and pi functions as defined in the Keccak256 specification.
 // We merge these two functions as rho consists of a rotation of the bits within each lane and pi is a remapping of

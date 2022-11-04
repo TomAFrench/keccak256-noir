@@ -10,6 +10,8 @@ node_modules/
 !.yarn/versions
 .pnp.*
 
-# Noir
-circuits/build/
-circuits/proofs/
+# Nargo output
+*.proof
+*.acir
+*.tr
+**/Verifier.toml

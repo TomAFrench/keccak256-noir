@@ -2,7 +2,7 @@ global STATE_SIZE: Field = 1600;
 global LANE_LENGTH: Field = 64;
 global NUM_ROUNDS: Field = 24;
 
-fn iota(state: [u1; STATE_SIZE], round_number: Field) -> [u1; STATE_SIZE] {
+fn iota(state: [u1; STATE_SIZE], round_number: comptime Field) -> [u1; STATE_SIZE] {
   // Each element of RC is a bitmap for the mask to apply to the lane.
   let RC: [u64; NUM_ROUNDS] = [
         0x0000000000000001, 0x0000000000008082, 0x800000000000808A,
@@ -20,7 +20,7 @@ fn iota(state: [u1; STATE_SIZE], round_number: Field) -> [u1; STATE_SIZE] {
     // In order to update Lane(0,0) we must only update the first `LANE_LENGTH` values of the state array.
     let mut new_state = state;
     for i in 0..LANE_LENGTH {
-      new_state[i] = state[i] ^ (rc & 1);
+      new_state[i] = state[i] ^ (rc as u1);
       // Equivalent to a bitshift right.
       rc = rc / 2;
     };

@@ -1,6 +1,6 @@
 global STATE_SIZE: Field = 1600;
 global LANE_LENGTH: Field = 64;
-global COLUMN_LENGTH: Field = 5
+global COLUMN_LENGTH: Field = 5;
 
 fn chi(state: [u1; STATE_SIZE]) -> [u1; STATE_SIZE] {
   // The labelling convention for the state array is `state[x, y, z] = state[LANE_LENGTH * (5y + x) + z]`.
@@ -17,4 +17,6 @@ fn chi(state: [u1; STATE_SIZE]) -> [u1; STATE_SIZE] {
       new_state[LANE_LENGTH * (5 * y + 4) + z] = state[LANE_LENGTH * (5 * y + 4) + z] ^ state[LANE_LENGTH * (5 * y + 0) + z] ^ state[LANE_LENGTH * (5 * y + 1) + z];
     };
   };
+
+  new_state
 }

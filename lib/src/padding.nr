@@ -9,7 +9,7 @@ fn pad(input: [u1; INPUT_SIZE], input_length: u64) -> [u1; BLOCK_SIZE] {
   // We require 2 bits of space after the message in order to include the padding bits.
   // constrain input_length < BLOCK_SIZE - 2;
 
-  let mut padded_input: [u1; BLOCK_SIZE] = [0 as u1; 10];
+  let mut padded_input: [u1; BLOCK_SIZE] = [0 as u1; BLOCK_SIZE];
   for i in 0..BLOCK_SIZE {
     if (i as u64) < input_length {
       // Copy input into padded array.

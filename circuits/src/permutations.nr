@@ -48,25 +48,11 @@ fn keccakfRound(state: [u1; STATE_SIZE], round_number: comptime Field) -> [u1; S
 
 fn keccakf(input: [u1; STATE_SIZE]) -> [u1; STATE_SIZE] {
   let mut state: [u1; STATE_SIZE] = [0 as u1; 1600];
-  let mut mid_round: [u1; 38400] = [0 as u1; 38400];
+  for j in 0..STATE_SIZE {
+    state[j] = input[j];
+  };
   for i in 0..24 {
-    if (i == 0) {
-        for j in 0..STATE_SIZE {
-          mid_round[j] = input[j];
-        }
-    }
-
-    let mut temp_state: [u1; STATE_SIZE] = [0 as u1; 1600];
-    for j in 0..STATE_SIZE {
-      temp_state[j] = mid_round[(i*STATE_SIZE)+j];
-    };
-    let round_result = keccakfRound(temp_state, i);
-    if (i < 23) {
-      for j in 0..STATE_SIZE {
-        mid_round[((i+1)*STATE_SIZE)+j] = round_result[j];
-      };
-    }
-    state = round_result;
+    state = keccakfRound(state, i);
   };
   state
 }

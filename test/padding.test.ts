@@ -10,8 +10,8 @@ import { resolve } from 'path';
 import { expect } from 'chai';
 import { readFileSync } from 'fs';
 
-const INPUT_SIZE = 10;
-const BLOCK_SIZE = 10;
+const INPUT_SIZE = 1086;
+const BLOCK_SIZE = 1088;
 
 type ProofInput = {
   input: number[];
@@ -36,7 +36,7 @@ describe('pad10*1', function () {
     return verify_proof(verifier, proof);
   }
 
-  const padMessage = (input: number[], input_length: number, padded_length: number) => {
+  const padMessage = (input: number[], input_length: number, padded_length: number): number[] => {
     if (input.slice(input_length).some((x) => x !== 0))
       throw new Error('input_length greater than actual input length');
     if (input_length > padded_length - 2) throw new Error('input_length greater than max allowed');

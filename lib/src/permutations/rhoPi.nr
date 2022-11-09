@@ -24,7 +24,7 @@ fn rhoPi(state: [u1; constants::STATE_SIZE]) -> [u1; constants::STATE_SIZE] {
     };
 
     // Now for the remaining lanes we write the rotated lane outputted from rho into the remapped lane specified by pi.
-    for i in 0..24 {
+    for i in 0..constants::NUM_LANES - 1 {
       for z in 0..constants::LANE_LENGTH {
         // This is equivalent to `(z - T[i]) % LANE_LENGTH`
         let shifted_z_position = if z >= T[i] { z - T[i] } else { constants::LANE_LENGTH - T[i] + z };

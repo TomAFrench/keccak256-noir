@@ -1,5 +1,6 @@
 global STATE_SIZE: Field = 1600;
 global LANE_LENGTH: Field = 64;
+global NUM_LANES: Field = 25;
 
 // This function is a combination of the rho and pi functions as defined in the Keccak256 specification.
 // We merge these two functions as rho consists of a rotation of the bits within each lane and pi is a remapping of
@@ -18,14 +19,14 @@ fn rhoPi(state: [u1; STATE_SIZE]) -> [u1; STATE_SIZE] {
     // This definition adds an additional modulo compared to the spec but makes it easier to calculate correct offsets.
     let T: [comptime Field; 24] = [1, 3, 6, 10, 15, 21, 28, 36, 45, 55, 2, 14, 27, 41, 56, 8, 25, 43, 62, 18, 39, 61, 20, 44];
 
-    let mut new_state: [u1; STATE_SIZE] = [0 as u1; 1600];
+    let mut new_state: [u1; STATE_SIZE] = [0 as u1; STATE_SIZE];
     // The center lane is unaffected by the rho and pi functions so we write it directly into the new state.
     for i in 0..LANE_LENGTH {
         new_state[i] = state[i];
     };
 
     // Now for the remaining lanes we write the rotated lane outputted from rho into the remapped lane specified by pi.
-    for i in 0..24 {
+    for i in 0..NUM_LANES - 1 {
       for z in 0..LANE_LENGTH {
         // This is equivalent to `(z - T[i]) % LANE_LENGTH`
         let shifted_z_position = if z >= T[i] { z - T[i] } else { LANE_LENGTH - T[i] + z };

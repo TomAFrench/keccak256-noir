@@ -5,11 +5,11 @@ fn theta(state: [u1; STATE_SIZE]) -> [u1; STATE_SIZE] {
     // The theta function works by calculating the parity of each of the columns in the state array. We store these
     // in the C[x, z] arrays.
     // C[x, z] = A[x, 0, z] ^ A[x, 1, z] ^ A[x, 2, z] ^ A[x, 3, z] ^ A[x, 4, z]
-    let mut c0: [u1; LANE_LENGTH] = [0 as u1; 64];
-    let mut c1: [u1; LANE_LENGTH] = [0 as u1; 64];
-    let mut c2: [u1; LANE_LENGTH] = [0 as u1; 64];
-    let mut c3: [u1; LANE_LENGTH] = [0 as u1; 64];
-    let mut c4: [u1; LANE_LENGTH] = [0 as u1; 64];
+    let mut c0: [u1; LANE_LENGTH] = [0 as u1; LANE_LENGTH];
+    let mut c1: [u1; LANE_LENGTH] = [0 as u1; LANE_LENGTH];
+    let mut c2: [u1; LANE_LENGTH] = [0 as u1; LANE_LENGTH];
+    let mut c3: [u1; LANE_LENGTH] = [0 as u1; LANE_LENGTH];
+    let mut c4: [u1; LANE_LENGTH] = [0 as u1; LANE_LENGTH];
     for i in 0..LANE_LENGTH {
       c0[i] = state[0 * LANE_LENGTH + i] ^ state[5 * LANE_LENGTH + i] ^ state[10 * LANE_LENGTH + i] ^ state[15 * LANE_LENGTH + i] ^ state[20 * LANE_LENGTH + i];
       c1[i] = state[1 * LANE_LENGTH + i] ^ state[6 * LANE_LENGTH + i] ^ state[11 * LANE_LENGTH + i] ^ state[16 * LANE_LENGTH + i] ^ state[21 * LANE_LENGTH + i];
@@ -19,11 +19,11 @@ fn theta(state: [u1; STATE_SIZE]) -> [u1; STATE_SIZE] {
     };
 
     // D[x, z] = C[(x - 1) mod 5, z] ^ C[(x + 1) mod 5, (z - 1) mod LANE_LENGTH]
-    let mut d0: [u1; LANE_LENGTH] = [0 as u1; 64]; // D[0, Z] = C[4, z] ^ C[1, (z-1) mod LANE_LENGTH]
-    let mut d1: [u1; LANE_LENGTH] = [0 as u1; 64]; // D[1, Z] = C[0, z] ^ C[2, (z-1) mod LANE_LENGTH]
-    let mut d2: [u1; LANE_LENGTH] = [0 as u1; 64]; // D[2, Z] = C[1, z] ^ C[3, (z-1) mod LANE_LENGTH]
-    let mut d3: [u1; LANE_LENGTH] = [0 as u1; 64]; // D[3, Z] = C[2, z] ^ C[4, (z-1) mod LANE_LENGTH]
-    let mut d4: [u1; LANE_LENGTH] = [0 as u1; 64]; // D[4, Z] = C[3, z] ^ C[0, (z-1) mod LANE_LENGTH]
+    let mut d0: [u1; LANE_LENGTH] = [0 as u1; LANE_LENGTH]; // D[0, Z] = C[4, z] ^ C[1, (z-1) mod LANE_LENGTH]
+    let mut d1: [u1; LANE_LENGTH] = [0 as u1; LANE_LENGTH]; // D[1, Z] = C[0, z] ^ C[2, (z-1) mod LANE_LENGTH]
+    let mut d2: [u1; LANE_LENGTH] = [0 as u1; LANE_LENGTH]; // D[2, Z] = C[1, z] ^ C[3, (z-1) mod LANE_LENGTH]
+    let mut d3: [u1; LANE_LENGTH] = [0 as u1; LANE_LENGTH]; // D[3, Z] = C[2, z] ^ C[4, (z-1) mod LANE_LENGTH]
+    let mut d4: [u1; LANE_LENGTH] = [0 as u1; LANE_LENGTH]; // D[4, Z] = C[3, z] ^ C[0, (z-1) mod LANE_LENGTH]
     // The modulus only affects the first cell in the lane so we handle this outside of the for-loop.
     d0[0] = c4[0] ^ c1[LANE_LENGTH - 1];
     d1[0] = c0[0] ^ c2[LANE_LENGTH - 1];

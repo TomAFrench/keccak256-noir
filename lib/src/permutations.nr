@@ -24,7 +24,6 @@ fn absorb(input: [u1; constants::BLOCK_SIZE]) -> [u1; constants::STATE_SIZE] {
 
 fn squeeze(input: [u1; constants::STATE_SIZE]) -> [u1; constants::OUTPUT_SIZE] {
 
-  // TODO: after PR for allowing expressions to be evaluated inside arrays gets merged in change array literal to [0 as u1; num_bits_out]
   let mut result: [u1; constants::OUTPUT_SIZE] = [0 as u1; constants::OUTPUT_SIZE];
 
   for i in 0..constants::OUTPUT_SIZE {

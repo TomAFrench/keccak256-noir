@@ -22,13 +22,13 @@ fn absorb(input: [u1; constants::BLOCK_SIZE]) -> [u1; constants::STATE_SIZE] {
   state
 }
 
-fn squeeze(input: [u1; constants::STATE_SIZE]) -> [u1; 256] {
+fn squeeze(input: [u1; constants::STATE_SIZE]) -> [u1; constants::OUTPUT_SIZE] {
 
   // TODO: after PR for allowing expressions to be evaluated inside arrays gets merged in change array literal to [0 as u1; num_bits_out]
-  let mut result: [u1; 256] = [0 as u1; 256];
+  let mut result: [u1; constants::OUTPUT_SIZE] = [0 as u1; constants::OUTPUT_SIZE];
 
   for i in 0..constants::STATE_SIZE {
-    if (i < 256) {
+    if (i < constants::OUTPUT_SIZE) {
       result[i] = input[i];
     }
   };
@@ -64,7 +64,7 @@ fn keccakFinal(input: [u1; constants::INPUT_SIZE], input_length: u64) -> [u1; co
   absorb_result
 }
 
-fn keccak(input: [u1; constants::INPUT_SIZE], input_length: u64) -> [u1; 256] {
+fn keccak(input: [u1; constants::INPUT_SIZE], input_length: u64) -> [u1; constants::OUTPUT_SIZE] {
 
   let final_state = keccakFinal(input, input_length);
 

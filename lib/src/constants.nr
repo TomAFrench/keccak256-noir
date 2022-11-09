@@ -5,6 +5,8 @@ global INPUT_SIZE: Field = 1086;
 // Blocks are 136 bytes. 138 * 8 = 1088 bits.
 global BLOCK_SIZE: Field = 1088;
 
+global OUTPUT_SIZE: Field = 256;
+
 // State size related
 global STATE_SIZE: Field = 1600;
 global LANE_LENGTH: Field = 64;

@@ -2,7 +2,7 @@ use crate::constants;
 
 fn iota(state: [u64; constants::NUM_LANES], round_number: comptime Field) -> [u64; constants::NUM_LANES] {
   // Each element of RC is a bitmap for the mask to apply to the lane.
-  let RC: [u64; constants::NUM_ROUNDS] = [
+  let RC: [comptime u64; constants::NUM_ROUNDS] = [
         0x0000000000000001, 0x0000000000008082, 0x800000000000808A,
         0x8000000080008000, 0x000000000000808B, 0x0000000080000001,
         0x8000000080008081, 0x8000000000008009, 0x000000000000008A,

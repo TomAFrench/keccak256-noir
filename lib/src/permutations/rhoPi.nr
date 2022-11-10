@@ -1,4 +1,4 @@
-use crate::constants as constants;
+use crate::constants;
 
 // This function is a combination of the rho and pi functions as defined in the Keccak256 specification.
 // We merge these two functions as rho consists of a rotation of the bits within each lane and pi is a remapping of

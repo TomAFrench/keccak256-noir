@@ -41,6 +41,17 @@ fn theta(state: [u2; constants::STATE_SIZE]) -> [u2; constants::STATE_SIZE] {
 
     // The labelling convention for the state array is `state[x, y, z] = state[LANE_LENGTH * (5y + x) + z]`.
     let mut new_state = state;
+    for y in 0..4 {
+      // Iterate over each row...
+      for i in 0..constants::LANE_LENGTH {
+        // and write updated values for each lane.
+        new_state[constants::LANE_LENGTH * (5 * y + 0) + i] = state[constants::LANE_LENGTH * (5 * y + 0) + i] ^ d0[i];
+        new_state[constants::LANE_LENGTH * (5 * y + 1) + i] = state[constants::LANE_LENGTH * (5 * y + 1) + i] ^ d1[i];
+        new_state[constants::LANE_LENGTH * (5 * y + 2) + i] = state[constants::LANE_LENGTH * (5 * y + 2) + i] ^ d2[i];
+        new_state[constants::LANE_LENGTH * (5 * y + 3) + i] = state[constants::LANE_LENGTH * (5 * y + 3) + i] ^ d3[i];
+        new_state[constants::LANE_LENGTH * (5 * y + 4) + i] = state[constants::LANE_LENGTH * (5 * y + 4) + i] ^ d4[i];
+      };
+    };
 
     new_state
 }

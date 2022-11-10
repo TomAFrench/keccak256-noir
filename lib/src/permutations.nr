@@ -1,4 +1,4 @@
-use crate::constants as constants;
+use crate::constants;
 
 mod chi;
 mod iota;

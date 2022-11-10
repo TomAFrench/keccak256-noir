@@ -1,9 +1,9 @@
 const LANE_LENGTH = 64;
 
-const stateArrayIndex = (x: number, y: number, z: number) => LANE_LENGTH * (5 * y + x) + z;
+const stateArrayIndex = (x: number, y: number) => 5 * y + x;
 
 // Convert x and y coordinates of a lane to its initial index in the state array
-const calculateLaneOffset = (x: number, y: number) => stateArrayIndex(x, y, 0);
+const calculateLaneOffset = (x: number, y: number) => stateArrayIndex(x, y);
 
 // Calculate the X and Y coordinates of the lanes to update in each round of rho.
 const calculateXYPairs = () => {

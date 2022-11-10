@@ -1,4 +1,4 @@
-use crate::constants as constants;
+use crate::constants;
 
 // This is a simplified implementation of the pad10*1 algorithm.
 // As we assume that the input length is smaller than the block size, we can ignore the potential for the padding

@@ -1,4 +1,4 @@
-use crate::constants as constants;
+use crate::constants;
 
 fn theta(state: [u1; constants::STATE_SIZE]) -> [u1; constants::STATE_SIZE] {
     // The theta function works by calculating the parity of each of the columns in the state array. We store these

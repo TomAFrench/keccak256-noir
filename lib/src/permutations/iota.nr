@@ -1,4 +1,4 @@
-use crate::constants as constants;
+use crate::constants;
 
 fn iota(state: [u2; constants::STATE_SIZE], round_number: comptime Field) -> [u2; constants::STATE_SIZE] {
   // Each element of RC is a bitmap for the mask to apply to the lane.

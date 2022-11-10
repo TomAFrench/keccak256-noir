@@ -1,9 +1,9 @@
 // Input size related
 
 // The input must be at least 2 bits smaller than the block size to accommodate the padding bits.
-global INPUT_SIZE: Field = 1086;
+global INPUT_SIZE: Field = 16;
 // Blocks are 136 bytes. 138 * 8 = 1088 bits.
-global BLOCK_SIZE: Field = 1088;
+global BLOCK_SIZE: Field = 17;
 
 // State size related
 global STATE_SIZE: Field = 1600;

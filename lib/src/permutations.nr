@@ -7,8 +7,8 @@ mod theta;
 
 // This is a simplified implementation of the Keccak256 absorb function where we assume the input is smaller than the
 // internal state size.
-fn absorb(input: [u1; constants::BLOCK_SIZE]) -> [u1; constants::STATE_SIZE] {
-  let mut state: [u1; constants::STATE_SIZE] = [0 as u1; constants::STATE_SIZE];
+fn absorb(input: [u2; constants::BLOCK_SIZE]) -> [u2; constants::STATE_SIZE] {
+  let mut state: [u2; constants::STATE_SIZE] = [0 as u2; constants::STATE_SIZE];
 
   // We should in theory XOR the input with the internal state. However we know that X ^ 0 = X so we can just write
   // the input into the state. We can do this as the input is guaranteed to be smaller than the state size.
@@ -22,9 +22,9 @@ fn absorb(input: [u1; constants::BLOCK_SIZE]) -> [u1; constants::STATE_SIZE] {
   state
 }
 
-fn squeeze(input: [u1; constants::STATE_SIZE]) -> [u1; constants::OUTPUT_SIZE] {
+fn squeeze(input: [u2; constants::STATE_SIZE]) -> [u2; constants::OUTPUT_SIZE] {
 
-  let mut result: [u1; constants::OUTPUT_SIZE] = [0 as u1; constants::OUTPUT_SIZE];
+  let mut result: [u2; constants::OUTPUT_SIZE] = [0 as u2; constants::OUTPUT_SIZE];
 
   for i in 0..constants::OUTPUT_SIZE {
       result[i] = input[i];
@@ -32,7 +32,7 @@ fn squeeze(input: [u1; constants::STATE_SIZE]) -> [u1; constants::OUTPUT_SIZE] {
   result
 }
 
-fn keccakfRound(state: [u1; constants::STATE_SIZE], round_number: comptime Field) -> [u1; constants::STATE_SIZE] {
+fn keccakfRound(state: [u2; constants::STATE_SIZE], round_number: comptime Field) -> [u2; constants::STATE_SIZE] {
 
   let state_after_theta = theta::theta(state);
   let state_after_rhoPi = rhoPi::rhoPi(state_after_theta);
@@ -42,26 +42,26 @@ fn keccakfRound(state: [u1; constants::STATE_SIZE], round_number: comptime Field
   new_state
 }
 
-fn keccakf(input: [u1; constants::STATE_SIZE]) -> [u1; constants::STATE_SIZE] {
-  let mut state: [u1; constants::STATE_SIZE] = [0 as u1; constants::STATE_SIZE];
+fn keccakf(input: [u2; constants::STATE_SIZE]) -> [u2; constants::STATE_SIZE] {
+  let mut state: [u2; constants::STATE_SIZE] = [0 as u2; constants::STATE_SIZE];
   for j in 0..constants::STATE_SIZE {
     state[j] = input[j];
   };
-  for i in 0..constants::NUM_ROUNDS {
+  for i in 0..constants::NUM_ROUNDS { 
     state = keccakfRound(state, i);
   };
   state
 }
 
-fn keccakFinal(input: [u1; constants::INPUT_SIZE], input_length: u64) -> [u1; constants::STATE_SIZE] {
-  let padded_input: [u1; constants::BLOCK_SIZE] = crate::padding::pad(input, input_length);
+fn keccakFinal(input: [u2; constants::INPUT_SIZE], input_length: u64) -> [u2; constants::STATE_SIZE] {
+  let padded_input: [u2; constants::BLOCK_SIZE] = crate::padding::pad(input, input_length);
 
-  let absorb_result: [u1; constants::STATE_SIZE] = absorb(padded_input);
+  let absorb_result: [u2; constants::STATE_SIZE] = absorb(padded_input);
 
   absorb_result
 }
 
-fn keccak(input: [u1; constants::INPUT_SIZE], input_length: u64) -> [u1; constants::OUTPUT_SIZE] {
+fn keccak(input: [u2; constants::INPUT_SIZE], input_length: u64) -> [u2; constants::OUTPUT_SIZE] {
 
   let final_state = keccakFinal(input, input_length);
 

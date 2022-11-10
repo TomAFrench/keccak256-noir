@@ -1,6 +1,6 @@
 use crate::constants as constants;
 
-fn chi(state: [u1; constants::STATE_SIZE]) -> [u1; constants::STATE_SIZE] {
+fn chi(state: [u2; constants::STATE_SIZE]) -> [u2; constants::STATE_SIZE] {
   // The labelling convention for the state array is `state[x, y, z] = state[LANE_LENGTH * (5y + x) + z]`.
   let mut new_state = state;
   for z in 0..constants::LANE_LENGTH {

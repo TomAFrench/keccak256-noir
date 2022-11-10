@@ -1,6 +1,6 @@
 use crate::constants as constants;
 
-fn iota(state: [u1; constants::STATE_SIZE], round_number: comptime Field) -> [u1; constants::STATE_SIZE] {
+fn iota(state: [u2; constants::STATE_SIZE], round_number: comptime Field) -> [u2; constants::STATE_SIZE] {
   // Each element of RC is a bitmap for the mask to apply to the lane.
   let RC: [u64; constants::NUM_ROUNDS] = [
         0x0000000000000001, 0x0000000000008082, 0x800000000000808A,
@@ -18,7 +18,7 @@ fn iota(state: [u1; constants::STATE_SIZE], round_number: comptime Field) -> [u1
     // In order to update Lane(0,0) we must only update the first `LANE_LENGTH` values of the state array.
     let mut new_state = state;
     for i in 0..constants::LANE_LENGTH {
-      new_state[i] = state[i] ^ (rc as u1);
+      new_state[i] = state[i] ^ (rc as u2);
       // Equivalent to a bitshift right.
       rc = rc / 2;
     };

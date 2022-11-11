@@ -6,7 +6,6 @@ global INPUT_SIZE: Field = 16;
 global BLOCK_SIZE: Field = 17;
 
 // State size related
-global STATE_SIZE: Field = 1600;
 global LANE_LENGTH: Field = 64;
 global COLUMN_LENGTH: Field = 5;
 global NUM_LANES: Field = 25;

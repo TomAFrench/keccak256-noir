@@ -9,11 +9,14 @@ fn pad(input: [u64; constants::INPUT_SIZE], input_length: u64) -> [u64; constant
 
   let mut padded_input: [u64; constants::BLOCK_SIZE] = [0 as u64; constants::BLOCK_SIZE];
   for i in 0..constants::INPUT_SIZE {
+    // Caching the word from input here reduces the number of gates.
+    let word = input[i];
+
     if input_length >= ((i + 1) * constants::LANE_LENGTH) as u64 {
       // The input continues past the end of the current word.
       // We then copy it verbatim into the padded input.
 
-      padded_input[i] = input[i];
+      padded_input[i] = word;
     } else if input_length >= (i * constants::LANE_LENGTH) as u64 {
       // The input ends in this current word.
       // We must then insert the first padding bit at the correct location before copying it.
@@ -34,13 +37,13 @@ fn pad(input: [u64; constants::INPUT_SIZE], input_length: u64) -> [u64; constant
       };
 
       // Copy across both the input and the padding bit.
-      padded_input[i] = input[i] | bit_mask;
+      padded_input[i] = word | bit_mask;
 
       // Ensure that all bits after the stated end of the message are zero.
-      constrain padded_input[i] & (bit_mask - 1) == 0;
+      constrain word & (bit_mask - 1) == 0;
     } else {
       // Input must be empty after end of message.
-      constrain input[i] == 0;
+      constrain word == 0;
     }
   };
 

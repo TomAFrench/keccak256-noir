@@ -18,11 +18,16 @@ fn pad(input: [u64; constants::INPUT_SIZE], input_length: u64) -> [u64; constant
       // The input ends in this current word.
       // We must then insert the first padding bit at the correct location before copying it.
 
-      // Ideally we'd perform a bitshift here but we cannot know `input_length` at compile time.
+
+      // Subtracting `i * constants::LANE_LENGTH` from `input_length` shifts it into the range [0, 63]
       let bit_position: u64 = input_length - (i * constants::LANE_LENGTH) as u64;
+
+      // We then want to insert a bit `bit_position` bits into the current word.
+      // To do this we mask the word with `2**(64 - bit_position)`.
+      // Ideally we'd perform a bitshift here but we cannot know `input_length` at compile time.
       let mut bit_mask: u64 = 1;
       for j in 0..64 {
-        // Note: pay attention to endianness here.
+        // Multiply by 2 64 - j times.
         if (j as u64) > bit_position {
           bit_mask = bit_mask * 2;
         }

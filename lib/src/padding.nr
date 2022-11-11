@@ -44,8 +44,14 @@ fn pad(input: [u64; constants::INPUT_SIZE], input_length: u64) -> [u64; constant
     }
   };
 
-  // Place the second 1 bit of the padding in the last bit of the block.
-  padded_input[constants::BLOCK_SIZE - 1] = 1;
+  if input_length == (constants::INPUT_SIZE * constants::LANE_LENGTH) as u64 {
+    // Both padding bits fall in the last word and so the first wasn't written during the for-loop.
+    // We can then just write both bits directly now.
+    padded_input[constants::BLOCK_SIZE - 1] = 0x8000000000000001;
+  } else {
+    // Place the second 1 bit of the padding in the last bit of the block.
+    padded_input[constants::BLOCK_SIZE - 1] = 1;
+  }
 
   padded_input
 }

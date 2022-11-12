@@ -52,20 +52,3 @@ fn keccakf(input: [u64; constants::NUM_LANES]) -> [u64; constants::NUM_LANES] {
   };
   state
 }
-
-fn keccakFinal(input: [u64; constants::INPUT_SIZE], input_length: u64) -> [u64; constants::NUM_LANES] {
-  let padded_input: [u64; constants::BLOCK_SIZE] = crate::padding::pad(input, input_length);
-
-  let absorb_result: [u64; constants::NUM_LANES] = absorb(padded_input);
-
-  absorb_result
-}
-
-fn keccak(input: [u64; constants::INPUT_SIZE], input_length: u64) -> [u64; constants::OUTPUT_SIZE] {
-
-  let final_state = keccakFinal(input, input_length);
-
-  let squeezed_state = squeeze(final_state);
-
-  squeezed_state
-}

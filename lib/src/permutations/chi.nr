@@ -1,19 +1,16 @@
 use crate::constants;
 
-fn chi(state: [u1; constants::STATE_SIZE]) -> [u1; constants::STATE_SIZE] {
-  // The labelling convention for the state array is `state[x, y, z] = state[LANE_LENGTH * (5y + x) + z]`.
+fn chi(state: [u64; constants::NUM_LANES]) -> [u64; constants::NUM_LANES] {
   let mut new_state = state;
-  for z in 0..constants::LANE_LENGTH {
-    // Iterate over each slice...
-    for y in 0..constants::COLUMN_LENGTH {
-      // and write updated values for each row.
-      // new_state[x, y, z] = new_state[x, y, z] ^ new_state[(x + 1) % 5, y, z] ^ new_state[(x + 2) % 5, y, z]
-      new_state[constants::LANE_LENGTH * (5 * y + 0) + z] = state[constants::LANE_LENGTH * (5 * y + 0) + z] ^ state[constants::LANE_LENGTH * (5 * y + 1) + z] ^ state[constants::LANE_LENGTH * (5 * y + 2) + z];
-      new_state[constants::LANE_LENGTH * (5 * y + 1) + z] = state[constants::LANE_LENGTH * (5 * y + 1) + z] ^ state[constants::LANE_LENGTH * (5 * y + 2) + z] ^ state[constants::LANE_LENGTH * (5 * y + 3) + z];
-      new_state[constants::LANE_LENGTH * (5 * y + 2) + z] = state[constants::LANE_LENGTH * (5 * y + 2) + z] ^ state[constants::LANE_LENGTH * (5 * y + 3) + z] ^ state[constants::LANE_LENGTH * (5 * y + 4) + z];
-      new_state[constants::LANE_LENGTH * (5 * y + 3) + z] = state[constants::LANE_LENGTH * (5 * y + 3) + z] ^ state[constants::LANE_LENGTH * (5 * y + 4) + z] ^ state[constants::LANE_LENGTH * (5 * y + 0) + z];
-      new_state[constants::LANE_LENGTH * (5 * y + 4) + z] = state[constants::LANE_LENGTH * (5 * y + 4) + z] ^ state[constants::LANE_LENGTH * (5 * y + 0) + z] ^ state[constants::LANE_LENGTH * (5 * y + 1) + z];
-    };
+
+  // The labelling convention for the state array is `Lane(x, y) = state[5y + x]`.
+  // Iterate over each plane and write updated values for each lane.
+  for y in 0..constants::COLUMN_LENGTH {
+    new_state[5 * y + 0] = state[5 * y + 0] ^ ((!state[5 * y + 1]) & state[5 * y + 2]);
+    new_state[5 * y + 1] = state[5 * y + 1] ^ ((!state[5 * y + 2]) & state[5 * y + 3]);
+    new_state[5 * y + 2] = state[5 * y + 2] ^ ((!state[5 * y + 3]) & state[5 * y + 4]);
+    new_state[5 * y + 3] = state[5 * y + 3] ^ ((!state[5 * y + 4]) & state[5 * y + 0]);
+    new_state[5 * y + 4] = state[5 * y + 4] ^ ((!state[5 * y + 0]) & state[5 * y + 1]);
   };
 
   new_state

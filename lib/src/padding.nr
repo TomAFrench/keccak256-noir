@@ -74,7 +74,7 @@ fn get_bit_mask(bit_position: Field) -> u64 {
   ];
 
   let mut bit_mask: u64 = 0;
-  for j in 0..63 {
+  for j in 0..64 {
     if j == bit_position {
       bit_mask = bit_masks[j];
     }

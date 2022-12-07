@@ -24,13 +24,13 @@ fn pad(input: [u64; constants::INPUT_SIZE], input_length: u64) -> [u64; constant
 
       // Subtracting `i * constants::LANE_LENGTH` from `input_length` shifts it into the range [0, 63]
       let bit_position: Field = input_length as Field - i * constants::LANE_LENGTH;
-      let bit_mask = get_bit_mask(bit_position);
+      let bit_mask: Field = get_bit_mask(bit_position);
 
       // Copy across both the input and the padding bit.
-      padded_input[i] = word | bit_mask;
+      padded_input[i] = word | (bit_mask as u64);
 
       // Ensure that all bits after the stated end of the message are zero.
-      constrain word & (bit_mask - 1) == 0;
+      constrain word & (bit_mask - 1) as u64 == 0;
     } else {
       // Input must be empty after end of message.
       constrain word == 0;
@@ -50,11 +50,11 @@ fn pad(input: [u64; constants::INPUT_SIZE], input_length: u64) -> [u64; constant
 }
 
 
-fn get_bit_mask(bit_position: Field) -> u64 {
+fn get_bit_mask(bit_position: Field) -> Field {
   // We need to be able to map from a bit position in the range [0, 63] to a bitmask which pulls out
   // that particular bit from a u64.
   // As we cannot perform bitshifts of non-comptime values then we must use a lookup table.
-  let bit_masks: [comptime u64; 64] = [
+  let bit_masks: [comptime Field; 64] = [
     0x8000000000000000, 0x4000000000000000, 0x2000000000000000, 0x1000000000000000,
     0x0800000000000000, 0x0400000000000000, 0x0200000000000000, 0x0100000000000000,
     0x0080000000000000, 0x0040000000000000, 0x0020000000000000, 0x0010000000000000,
@@ -73,7 +73,7 @@ fn get_bit_mask(bit_position: Field) -> u64 {
     0x0000000000000008, 0x0000000000000004, 0x0000000000000002, 0x0000000000000001
   ];
 
-  let mut bit_mask: u64 = 0;
+  let mut bit_mask: Field = 0;
   for j in 0..64 {
     if j == bit_position {
       bit_mask = bit_masks[j];

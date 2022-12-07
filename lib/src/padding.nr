@@ -24,13 +24,9 @@ fn pad(input: [u64; constants::INPUT_SIZE], input_length: u64) -> [u64; constant
 
       // Subtracting `i * constants::LANE_LENGTH` from `input_length` shifts it into the range [0, 63]
       let bit_position: Field = input_length as Field - i * constants::LANE_LENGTH;
-      let bit_mask: Field = get_bit_mask(bit_position);
 
-      // Copy across both the input and the padding bit.
-      padded_input[i] = word | (bit_mask as u64);
-
-      // Ensure that all bits after the stated end of the message are zero.
-      constrain word & (bit_mask - 1) as u64 == 0;
+      // Insert the padding bit, ensuring that it sits after the end of the message.
+      padded_input[i] = insert_bit_into_word_checked(word, bit_position);
     } else {
       // Input must be empty after end of message.
       constrain word == 0;
@@ -49,6 +45,17 @@ fn pad(input: [u64; constants::INPUT_SIZE], input_length: u64) -> [u64; constant
   padded_input
 }
 
+// Insert the padding bit into the specified word.
+// This function also checks that all bits from the padding bit onwards are zero.
+fn insert_bit_into_word_checked(word: u64, bit_position: Field) -> u64 {
+  let bit_insert_mask: Field = get_bit_mask(bit_position);
+
+  let check_mask: u64 = (2 * bit_insert_mask - 1) as u64;
+  // Ensure that all bits from `bit_position` onwards are zero.
+  constrain word & check_mask == 0;
+
+  word | bit_insert_mask as u64
+}
 
 fn get_bit_mask(bit_position: Field) -> Field {
   // We need to be able to map from a bit position in the range [0, 63] to a bitmask which pulls out

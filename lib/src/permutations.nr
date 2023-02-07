@@ -8,7 +8,7 @@ mod theta;
 // This is a simplified implementation of the Keccak256 absorb function where we assume the input is smaller than the
 // internal state size.
 fn absorb(input: [u64; constants::BLOCK_SIZE]) -> [u64; constants::NUM_LANES] {
-  let mut state: [u64; constants::NUM_LANES] = [0 as u64; constants::NUM_LANES];
+  let mut state: [u64; constants::NUM_LANES] = [0; constants::NUM_LANES];
 
   // We should in theory XOR the input with the internal state. However we know that X ^ 0 = X so we can just write
   // the input into the state. We can do this as the input is guaranteed to be smaller than the state size.
@@ -24,7 +24,7 @@ fn absorb(input: [u64; constants::BLOCK_SIZE]) -> [u64; constants::NUM_LANES] {
 
 fn squeeze(input: [u64; constants::NUM_LANES]) -> [u64; constants::OUTPUT_SIZE] {
 
-  let mut result: [u64; constants::OUTPUT_SIZE] = [0 as u64; constants::OUTPUT_SIZE];
+  let mut result: [u64; constants::OUTPUT_SIZE] = [0; constants::OUTPUT_SIZE];
 
   for i in 0..constants::OUTPUT_SIZE {
       result[i] = input[i];
@@ -52,10 +52,10 @@ fn keccakf(input: [u64; constants::NUM_LANES]) -> [u64; constants::NUM_LANES] {
 
 #[test]
 fn test_keccakfRound(){
-  let input: [u64; constants::NUM_LANES] = [0 as u64; constants::NUM_LANES];
+  let input: [u64; constants::NUM_LANES] = [0; constants::NUM_LANES];
 
   // Round 0
-  let mut after_round_one: [u64; constants::NUM_LANES] = [0 as u64; constants::NUM_LANES];
+  let mut after_round_one: [u64; constants::NUM_LANES] = [0; constants::NUM_LANES];
   after_round_one[0] = 0x0000000000000001;
   constrain keccakfRound(input, 0) == after_round_one;
 }
@@ -64,7 +64,7 @@ fn test_keccakfRound(){
 fn test_keccakf(){
   // Test cases taken from:
   // https://github.com/XKCP/XKCP/blob/64404beeeb261b08a1076fe2f076e4e28dd9b040/tests/TestVectors/KeccakF-1600-IntermediateValues.txt
-  let input_state: [u64; constants::NUM_LANES] = [0 as u64; constants::NUM_LANES];
+  let input_state: [u64; constants::NUM_LANES] = [0; constants::NUM_LANES];
 
   // Permutation 0
   let perm_zero_output: [u64; constants::NUM_LANES] = [

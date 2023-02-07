@@ -8,7 +8,7 @@ fn pad(input: [u64; constants::INPUT_SIZE], input_length: u64) -> [u64; constant
   // constrain input_length < BLOCK_SIZE - 2;
 
 
-  let mut padded_input: [u64; constants::BLOCK_SIZE] = [0 as u64; constants::BLOCK_SIZE];
+  let mut padded_input: [u64; constants::BLOCK_SIZE] = [0; constants::BLOCK_SIZE];
   for i in 0..constants::INPUT_SIZE {
     // Caching the word from input here reduces the number of gates.
     let word = input[i];

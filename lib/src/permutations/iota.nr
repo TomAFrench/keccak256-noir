@@ -26,7 +26,7 @@ fn test_iota(){
   // https://github.com/XKCP/XKCP/blob/64404beeeb261b08a1076fe2f076e4e28dd9b040/tests/TestVectors/KeccakF-1600-IntermediateValues.txt
   
   // Round 0
-  let round_zero_input: [u64; constants::NUM_LANES] = [0 as u64; constants::NUM_LANES];
+  let round_zero_input: [u64; constants::NUM_LANES] = [0; constants::NUM_LANES];
   let round_zero_output = [
     0x0000000000000001,0x0000000000000000,0x0000000000000000,0x0000000000000000,0x0000000000000000,
     0x0000000000000000,0x0000000000000000,0x0000000000000000,0x0000000000000000,0x0000000000000000,

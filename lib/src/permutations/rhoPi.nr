@@ -16,7 +16,7 @@ fn rhoPi(state: [u64; constants::NUM_LANES]) -> [u64; constants::NUM_LANES] {
     // This definition adds an additional modulo compared to the spec but makes it easier to calculate correct offsets.
     let T: [comptime u64; 24] = [1, 3, 6, 10, 15, 21, 28, 36, 45, 55, 2, 14, 27, 41, 56, 8, 25, 43, 62, 18, 39, 61, 20, 44];
 
-    let mut new_state: [u64; constants::NUM_LANES] = [0 as u64; constants::NUM_LANES];
+    let mut new_state: [u64; constants::NUM_LANES] = [0; constants::NUM_LANES];
 
     // The center lane is unaffected by the rho and pi functions so we write it directly into the new state.
     new_state[0] = state[0];
@@ -40,7 +40,7 @@ fn test_rhoPi(){
   // https://github.com/XKCP/XKCP/blob/64404beeeb261b08a1076fe2f076e4e28dd9b040/tests/TestVectors/KeccakF-1600-IntermediateValues.txt
   
   // Round 0
-  let round_zero_input: [u64; constants::NUM_LANES] = [0 as u64; constants::NUM_LANES];
+  let round_zero_input: [u64; constants::NUM_LANES] = [0; constants::NUM_LANES];
   constrain rhoPi(round_zero_input) == round_zero_input;
 
   // Round 1

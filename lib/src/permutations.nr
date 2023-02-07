@@ -43,10 +43,7 @@ fn keccakfRound(state: [u64; constants::NUM_LANES], round_number: comptime Field
 }
 
 fn keccakf(input: [u64; constants::NUM_LANES]) -> [u64; constants::NUM_LANES] {
-  let mut state: [u64; constants::NUM_LANES] = [0 as u64; constants::NUM_LANES];
-  for j in 0..constants::NUM_LANES {
-    state[j] = input[j];
-  };
+  let mut state = input;
   for i in 0..constants::NUM_ROUNDS {
     state = keccakfRound(state, i);
   };

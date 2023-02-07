@@ -8,7 +8,7 @@ fn rhoPi(state: [u64; constants::NUM_LANES]) -> [u64; constants::NUM_LANES] {
     // These are precomputed pairs of indices within the state array which specify how to perform the pi mapping.
     // Lanes are remapped such that the lane sitting at index READ_LANE_OFFSETS[i] is remapped to WRITE_LANE_OFFSETS[i].
     let READ_LANE_OFFSETS: [comptime Field; 24] = [1, 10, 7, 11, 17, 18, 3, 5, 16, 8, 21, 24, 4, 15, 23, 19, 13, 12, 2, 20, 14, 22, 9, 6];
-    let WRITE_LANE_OFFSETS: [comptime Field; 24] = [6, 1, 10, 7, 11, 17, 18, 3, 5, 16, 8, 21, 24, 4, 15, 23, 19, 13, 12, 2, 20, 14, 22, 9];
+    let WRITE_LANE_OFFSETS: [comptime Field; 24] = [10, 7, 11, 17, 18, 3, 5, 16, 8, 21, 24, 4, 15, 23, 19, 13, 12, 2, 20, 14, 22, 9, 6, 1];
 
     // This array defines the rho mapping to be applied to each lane.
     // Each lane is rotated by the specified number of bits, mapping the z coordinate as `z -> (z - T[i]) % LANE_LENGTH`

@@ -30,7 +30,7 @@ fn rhoPi(state: [u64; constants::NUM_LANES]) -> [u64; constants::NUM_LANES] {
 }
 
 fn rotl64(num: u64, rot: comptime u64) -> u64 {
-  (num << rot) | (num >> (64 - rot))
+  (num << rot) + (num >> (64 - rot))
 }
 
 

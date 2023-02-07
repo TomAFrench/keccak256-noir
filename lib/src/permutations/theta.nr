@@ -18,7 +18,7 @@ fn theta(state: [u64; constants::NUM_LANES]) -> [u64; constants::NUM_LANES] {
     let d4: u64 = c3 ^ rotl64(c0, 1);
 
     // The labelling convention for the state array is `lane(x, y) = state[5y + x]`.
-    let mut new_state = state;
+    let mut new_state = [0; constants::NUM_LANES];
     for y in 0..constants::COLUMN_LENGTH {
         new_state[5 * y + 0] = state[5 * y + 0] ^ d0;
         new_state[5 * y + 1] = state[5 * y + 1] ^ d1;

@@ -1,0 +1,30 @@
+name: Noir
+
+on:
+  push:
+  pull_request:
+    branches: [master]
+
+env:
+  CARGO_TERM_COLOR: always
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout sources
+        uses: actions/checkout@v2
+
+      - name: Install noir toolchain
+        run: |
+          curl -L https://raw.githubusercontent.com/noir-lang/noirup/main/install | bash
+          chmod +x /home/runner/.nargo/bin/noirup
+          bash /home/runner/.nargo/bin/noirup
+          chmod +x /home/runner/.nargo/bin/nargo
+          echo "${HOME}/.nargo/bin" >> $GITHUB_PATH
+
+      - name: Run nargo test
+        run: |
+          cd lib
+          nargo test
+        

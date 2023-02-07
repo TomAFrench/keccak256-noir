@@ -19,6 +19,9 @@ const calculateXYPairs = () => {
   return pairs;
 };
 
+
+// NOTE: This calculation of the lanes remapping is incorrect.
+
 // Given the x and y coordinates of a lane, return the x and y coordinates of the lane it is mapped to by pi.
 const piLaneRemapping = (x: number, y: number): [number, number] => [(x + 3 * y) % 5, x];
 

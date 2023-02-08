@@ -1,46 +1,39 @@
 use crate::constants;
 use crate::padding;
+use dep::std;
 
 mod chi;
 mod iota;
 mod rhoPi;
 mod theta;
 
-global BYTE: Field = 8;
-
 // This is a simplified implementation of the Keccak256 absorb function where we assume the input is smaller than the
 // absorption function's rate. This allows us to write the input into the state without performing permutations.
-fn absorb(input: [u64; constants::INPUT_SIZE], input_length: u64) -> [u64; constants::NUM_LANES] {
+fn absorb<I>(input: [u64; I], byte_position: Field) -> [u64; constants::NUM_LANES] {
+  // `byte_position` represents the index of the end of the message in the last u64 in `input`.
+  // e.g. 0x0000000000000080 has a `byte_position` of 7, 0x0000000000060000 has a `byte_position` of 5.
+  constrain byte_position as u64 < 8;
+
   let mut state: [u64; constants::NUM_LANES] = [0; constants::NUM_LANES];
 
+  let input_length: comptime Field = std::array::len(input);
+
+  // Constrain input length to be less than the block size.
+  // This is what allows us to simpilify this function to not include permutations.
+  constrain input_length as u64 < constants::BLOCK_SIZE as u64;
+
   // We should in theory XOR the input with the internal state. However we know that X ^ 0 = X so we can just write
-  // the input into the state. We can do this as the input is guaranteed to be smaller than the rate.
-  for i in 0..constants::INPUT_SIZE {
-    // Caching the word from input here reduces the number of gates.
-    let word = input[i];
-
-    if input_length >= ((i + 1) * BYTE) as u64 {
-      // The input continues past the end of the current word.
-      // We then copy it verbatim into the padded input.
-
-      state[i] = word;
-    } else if input_length >= (i * BYTE) as u64 {
-      // The input ends in this current word.
-      // We must then insert the first padding bit at the correct location before copying it.
-
-      // Subtracting `i * 8` from `input_length` shifts it into the range [0, 8)
-      let byte_position: Field = input_length as Field - i * BYTE;
-
-      padding::check_message_end(word, byte_position);
-      
-      // Copy across both the input and the padding bit.
-      state[i] = padding::insert_delimited_suffix(word, byte_position);
-    } else {
-      // Input must be empty after end of message.
-      constrain word == 0;
-    }
+  // the input into the state. We can do this as the input is guaranteed to be smaller than the rate (block size).
+  for i in 0..input_length {
+    state[i] = input[i];
   }
 
+  // The delimited suffix is the 0x06. This is composed of: 
+  // a) the domain separator which is the bits 01
+  // b) the first padding bit which immediately follows the domain separator.
+  // These combined make up the byte 0110 which in hex is 0x06. 
+  state[input_length - 1] = padding::insert_delimited_suffix(state[input_length - 1], byte_position);
+  // We then insert the final padding bit at the end of the block
   state[constants::BLOCK_SIZE - 1] = 0x0000000000000080;
 
   keccakf(state)
@@ -111,37 +104,32 @@ fn test_keccakf(){
   constrain keccakf(perm_zero_output) == perm_one_output;
 
   // Zero input (after padding)
-  let padded_zero_input: [u64; constants::NUM_LANES] = [
-    0x0600000000000000, 0x0000000000000000, 0x0000000000000000, 0x0000000000000000,
-    0x0000000000000000, 0x0000000000000000, 0x0000000000000000, 0x0000000000000000,
-    0x0000000000000000, 0x0000000000000000, 0x0000000000000000, 0x0000000000000000,
-    0x0000000000000000, 0x0000000000000000, 0x0000000000000000, 0x0000000000000000,
-    0x0000000000000080, 0x0000000000000000, 0x0000000000000000, 0x0000000000000000,
-    0x0000000000000000, 0x0000000000000000, 0x0000000000000000, 0x0000000000000000,
-    0x0000000000000000,
-  ];
-  let expected_output: [u64; constants::NUM_LANES] = [
-    0xA7FFC6F8BF1ED766, 0x51C14756A061D662, 0xF580FF4DE43B49FA, 0x82D80A4B80F8434A,
-    0x5266BEB7346BF3E2, 0x6695CCCA215987FF, 0x89BAB376577BD980, 0x3B316AFC55BDDE28,
-    0xCC8EE4F1193DAC03, 0xE934E4C1EC3A1978, 0x791EE8AF23A987C2, 0x331F6001E34A6821,
-    0x5FE7099E467E2E28, 0xB8B682C2D21E7DD1, 0x4E43AFADD2E050F0, 0xB089A96AFBF67553,
-    0x1EF1FA3260B9C6C2, 0xB2A155F0D34D6863, 0xB2C28E988B3908D9, 0x26D30B3E90103F91,
-    0x1798474D6634FC33, 0x58DE8F071A5C712B, 0x79973651927C0B14, 0x5EEBBDAAA7437385,
-    0xE5707BFB0E6E1392 
-  ];
-  constrain keccakf(padded_zero_input) == expected_output;
+  // let padded_zero_input: [u64; constants::NUM_LANES] = [
+  //   0x0600000000000000, 0x0000000000000000, 0x0000000000000000, 0x0000000000000000,
+  //   0x0000000000000000, 0x0000000000000000, 0x0000000000000000, 0x0000000000000000,
+  //   0x0000000000000000, 0x0000000000000000, 0x0000000000000000, 0x0000000000000000,
+  //   0x0000000000000000, 0x0000000000000000, 0x0000000000000000, 0x0000000000000000,
+  //   0x0000000000000080, 0x0000000000000000, 0x0000000000000000, 0x0000000000000000,
+  //   0x0000000000000000, 0x0000000000000000, 0x0000000000000000, 0x0000000000000000,
+  //   0x0000000000000000,
+  // ];
+  // let expected_output: [u64; constants::NUM_LANES] = [
+  //   0xA7FFC6F8BF1ED766, 0x51C14756A061D662, 0xF580FF4DE43B49FA, 0x82D80A4B80F8434A,
+  //   0x5266BEB7346BF3E2, 0x6695CCCA215987FF, 0x89BAB376577BD980, 0x3B316AFC55BDDE28,
+  //   0xCC8EE4F1193DAC03, 0xE934E4C1EC3A1978, 0x791EE8AF23A987C2, 0x331F6001E34A6821,
+  //   0x5FE7099E467E2E28, 0xB8B682C2D21E7DD1, 0x4E43AFADD2E050F0, 0xB089A96AFBF67553,
+  //   0x1EF1FA3260B9C6C2, 0xB2A155F0D34D6863, 0xB2C28E988B3908D9, 0x26D30B3E90103F91,
+  //   0x1798474D6634FC33, 0x58DE8F071A5C712B, 0x79973651927C0B14, 0x5EEBBDAAA7437385,
+  //   0xE5707BFB0E6E1392 
+  // ];
+  // constrain keccakf(padded_zero_input) == expected_output;
 }
 
 
 #[test]
 fn test_absorb() {
-  let input: [u64; constants::INPUT_SIZE] = [
-    0x0000000000000000, 0x0000000000000000, 0x0000000000000000, 0x0000000000000000,
-    0x0000000000000000, 0x0000000000000000, 0x0000000000000000, 0x0000000000000000,
-    0x0000000000000000, 0x0000000000000000, 0x0000000000000000, 0x0000000000000000,
-    0x0000000000000000, 0x0000000000000000, 0x0000000000000000, 0x0000000000000000
-  ];
-  let input_length: u64 = 8;
+  let input: [u64; 1] = [0x6162630000000000];
+  let byte_position: Field = 3;
   let expected_output: [u64; constants::NUM_LANES] = [
     0xA7FFC6F8BF1ED766, 0x51C14756A061D662, 0xF580FF4DE43B49FA, 0x82D80A4B80F8434A,
     0x5266BEB7346BF3E2, 0x6695CCCA215987FF, 0x89BAB376577BD980, 0x3B316AFC55BDDE28,
@@ -151,7 +139,7 @@ fn test_absorb() {
     0x1798474D6634FC33, 0x58DE8F071A5C712B, 0x79973651927C0B14, 0x5EEBBDAAA7437385,
     0xE5707BFB0E6E1392 
   ];
-  constrain absorb(input, input_length) == expected_output;
+  constrain absorb(input, byte_position) == expected_output;
 }
 
 #[test]

@@ -1,26 +1,49 @@
 use crate::constants;
+use crate::padding;
 
 mod chi;
 mod iota;
 mod rhoPi;
 mod theta;
 
-// This is a simplified implementation of the Keccak256 absorb function where we assume the input is smaller than the
-// internal state size.
-fn absorb(input: [u64; constants::BLOCK_SIZE]) -> [u64; constants::NUM_LANES] {
-  keccakf(write_block_to_state(input))
-}
+global BYTE: Field = 8;
 
-fn write_block_to_state(input: [u64; constants::BLOCK_SIZE]) -> [u64; constants::NUM_LANES] {
+// This is a simplified implementation of the Keccak256 absorb function where we assume the input is smaller than the
+// absorption function's rate. This allows us to write the input into the state without performing permutations.
+fn absorb(input: [u64; constants::INPUT_SIZE], input_length: u64) -> [u64; constants::NUM_LANES] {
   let mut state: [u64; constants::NUM_LANES] = [0; constants::NUM_LANES];
 
   // We should in theory XOR the input with the internal state. However we know that X ^ 0 = X so we can just write
-  // the input into the state. We can do this as the input is guaranteed to be smaller than the state size.
-  for i in 0..constants::BLOCK_SIZE {
-    state[i] = input[i];
-  };
+  // the input into the state. We can do this as the input is guaranteed to be smaller than the rate.
+  for i in 0..constants::INPUT_SIZE {
+    // Caching the word from input here reduces the number of gates.
+    let word = input[i];
 
-  state
+    if input_length >= ((i + 1) * BYTE) as u64 {
+      // The input continues past the end of the current word.
+      // We then copy it verbatim into the padded input.
+
+      state[i] = word;
+    } else if input_length >= (i * BYTE) as u64 {
+      // The input ends in this current word.
+      // We must then insert the first padding bit at the correct location before copying it.
+
+      // Subtracting `i * 8` from `input_length` shifts it into the range [0, 8)
+      let byte_position: Field = input_length as Field - i * BYTE;
+
+      padding::check_message_end(word, byte_position);
+      
+      // Copy across both the input and the padding bit.
+      state[i] = padding::insert_delimited_suffix(word, byte_position);
+    } else {
+      // Input must be empty after end of message.
+      constrain word == 0;
+    }
+  }
+
+  state[constants::BLOCK_SIZE - 1] = 0x0000000000000080;
+
+  keccakf(state)
 }
 
 fn squeeze(input: [u64; constants::NUM_LANES]) -> [u64; constants::OUTPUT_SIZE] {
@@ -109,37 +132,16 @@ fn test_keccakf(){
   constrain keccakf(padded_zero_input) == expected_output;
 }
 
-#[test]
-fn test_write_block_to_state() {
-  let input: [u64; constants::BLOCK_SIZE] = [
-    0x0600000000000000, 0x0000000000000000, 0x0000000000000000, 0x0000000000000000,
-    0x0000000000000000, 0x0000000000000000, 0x0000000000000000, 0x0000000000000000,
-    0x0000000000000000, 0x0000000000000000, 0x0000000000000000, 0x0000000000000000,
-    0x0000000000000000, 0x0000000000000000, 0x0000000000000000, 0x0000000000000000,
-    0x0000000000000080
-  ];
-  let expected_output: [u64; constants::NUM_LANES] = [
-    0x0600000000000000, 0x0000000000000000, 0x0000000000000000, 0x0000000000000000,
-    0x0000000000000000, 0x0000000000000000, 0x0000000000000000, 0x0000000000000000,
-    0x0000000000000000, 0x0000000000000000, 0x0000000000000000, 0x0000000000000000,
-    0x0000000000000000, 0x0000000000000000, 0x0000000000000000, 0x0000000000000000,
-    0x0000000000000080, 0x0000000000000000, 0x0000000000000000, 0x0000000000000000,
-    0x0000000000000000, 0x0000000000000000, 0x0000000000000000, 0x0000000000000000,
-    0x0000000000000000,
-  ];
-  constrain write_block_to_state(input) == expected_output;
-}
-
 
 #[test]
 fn test_absorb() {
-  let input: [u64; constants::BLOCK_SIZE] = [
-    0x0600000000000000, 0x0000000000000000, 0x0000000000000000, 0x0000000000000000,
+  let input: [u64; constants::INPUT_SIZE] = [
     0x0000000000000000, 0x0000000000000000, 0x0000000000000000, 0x0000000000000000,
     0x0000000000000000, 0x0000000000000000, 0x0000000000000000, 0x0000000000000000,
     0x0000000000000000, 0x0000000000000000, 0x0000000000000000, 0x0000000000000000,
-    0x0000000000000080
+    0x0000000000000000, 0x0000000000000000, 0x0000000000000000, 0x0000000000000000
   ];
+  let input_length: u64 = 8;
   let expected_output: [u64; constants::NUM_LANES] = [
     0xA7FFC6F8BF1ED766, 0x51C14756A061D662, 0xF580FF4DE43B49FA, 0x82D80A4B80F8434A,
     0x5266BEB7346BF3E2, 0x6695CCCA215987FF, 0x89BAB376577BD980, 0x3B316AFC55BDDE28,
@@ -149,7 +151,7 @@ fn test_absorb() {
     0x1798474D6634FC33, 0x58DE8F071A5C712B, 0x79973651927C0B14, 0x5EEBBDAAA7437385,
     0xE5707BFB0E6E1392 
   ];
-  constrain absorb(input) == expected_output;
+  constrain absorb(input, input_length) == expected_output;
 }
 
 #[test]

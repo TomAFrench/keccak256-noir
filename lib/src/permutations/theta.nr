@@ -1,6 +1,6 @@
 use crate::constants;
 
-fn theta(state: [u64; constants::NUM_LANES]) -> [u64; constants::NUM_LANES] {
+pub fn theta(state: [u64; constants::NUM_LANES]) -> [u64; constants::NUM_LANES] {
     // The theta function works by calculating the parity of each of the columns in the state array. We store these
     // in the C[x, z] arrays.
     // C[x, z] = A[x, 0, z] ^ A[x, 1, z] ^ A[x, 2, z] ^ A[x, 3, z] ^ A[x, 4, z]
@@ -30,16 +30,16 @@ fn theta(state: [u64; constants::NUM_LANES]) -> [u64; constants::NUM_LANES] {
     new_state
 }
 
-fn rotl64(num: u64, rot: comptime u64) -> u64 {
+fn rotl64(num: u64, rot:  u64) -> u64 {
   (num << rot) + (num >> (64 - rot))
 }
 
 #[test]
 fn test_rotl64() {
-  constrain rotl64(0x0000000000000001, 1) == 0x0000000000000002;
-  constrain rotl64(0x8000000000000001, 1) == 0x0000000000000003;
-  constrain rotl64(0xf000012300000001, 1) == 0xe000024600000003;
-  constrain rotl64(0xf000012300000001, 64) == 0xf000012300000001;
+  assert(rotl64(0x0000000000000001, 1) == 0x0000000000000002);
+  assert(rotl64(0x8000000000000001, 1) == 0x0000000000000003);
+  assert(rotl64(0xf000012300000001, 1) == 0xe000024600000003);
+  assert(rotl64(0xf000012300000001, 64) == 0xf000012300000001);
 }
 
 #[test]
@@ -49,7 +49,7 @@ fn test_theta(){
   
   // Round 0
   let round_zero_input: [u64; constants::NUM_LANES] = [0; constants::NUM_LANES];
-  constrain theta(round_zero_input) == round_zero_input;
+  assert(theta(round_zero_input) == round_zero_input);
 
   // Round 1
   let mut round_one_input: [u64; constants::NUM_LANES] = [0; constants::NUM_LANES];
@@ -61,7 +61,7 @@ fn test_theta(){
     0x0000000000000000,0x0000000000000001,0x0000000000000000,0x0000000000000000,0x0000000000000002,
     0x0000000000000000,0x0000000000000001,0x0000000000000000,0x0000000000000000,0x0000000000000002
   ];
-  constrain theta(round_one_input) == round_one_output;
+  assert(theta(round_one_input) == round_one_output);
 
   // Round 2
   let round_two_input: [u64; constants::NUM_LANES] = [
@@ -78,5 +78,5 @@ fn test_theta(){
     0x0000700010608004, 0x0000030010018C89, 0x0000700020200206, 0x000021001041840C, 0x0000220030010B01,
     0x0000710000608404, 0x0000030010018C89, 0x0000710020200602, 0x000021000041840C, 0x0000220030010B05,
   ];
-  constrain theta(round_two_input) == round_two_output;
+  assert(theta(round_two_input) == round_two_output);
 }

@@ -7,7 +7,7 @@ mod theta;
 
 // This is a simplified implementation of the Keccak256 absorb function where we assume the input is smaller than the
 // internal state size.
-fn absorb(input: [u64; constants::BLOCK_SIZE]) -> [u64; constants::NUM_LANES] {
+pub fn absorb(input: [u64; constants::BLOCK_SIZE]) -> [u64; constants::NUM_LANES] {
   let mut state: [u64; constants::NUM_LANES] = [0; constants::NUM_LANES];
 
   // We should in theory XOR the input with the internal state. However we know that X ^ 0 = X so we can just write
@@ -22,7 +22,7 @@ fn absorb(input: [u64; constants::BLOCK_SIZE]) -> [u64; constants::NUM_LANES] {
   state
 }
 
-fn squeeze(input: [u64; constants::NUM_LANES]) -> [u64; constants::OUTPUT_SIZE] {
+pub fn squeeze(input: [u64; constants::NUM_LANES]) -> [u64; constants::OUTPUT_SIZE] {
 
   let mut result: [u64; constants::OUTPUT_SIZE] = [0; constants::OUTPUT_SIZE];
 
@@ -32,7 +32,7 @@ fn squeeze(input: [u64; constants::NUM_LANES]) -> [u64; constants::OUTPUT_SIZE] 
   result
 }
 
-fn keccakfRound(state: [u64; constants::NUM_LANES], round_number: comptime Field) -> [u64; constants::NUM_LANES] {
+fn keccakfRound(state: [u64; constants::NUM_LANES], round_number:  Field) -> [u64; constants::NUM_LANES] {
 
   let state_after_theta = theta::theta(state);
   let state_after_rhoPi = rhoPi::rhoPi(state_after_theta);
@@ -57,7 +57,7 @@ fn test_keccakfRound(){
   // Round 0
   let mut after_round_one: [u64; constants::NUM_LANES] = [0; constants::NUM_LANES];
   after_round_one[0] = 0x0000000000000001;
-  constrain keccakfRound(input, 0) == after_round_one;
+  assert(keccakfRound(input, 0) == after_round_one);
 }
 
 #[test]
@@ -74,7 +74,7 @@ fn test_keccakf(){
     0x05E5635A21D9AE61, 0x64BEFEF28CC970F2, 0x613670957BC46611, 0xB87C5A554FD00ECB, 0x8C3EE88A1CCF32C8,
     0x940C7922AE3A2614, 0x1841F924A2C509E4, 0x16F53526E70465C2, 0x75F644E97F30A13B, 0xEAF1FF7B5CECA249,
   ];
-  constrain keccakf(input_state) == perm_zero_output;
+  assert(keccakf(input_state) == perm_zero_output);
 
   // Permutation 1
   let perm_one_output: [u64; constants::NUM_LANES] = [
@@ -84,5 +84,5 @@ fn test_keccakf(){
     0xFD5449A6BF174743, 0x97DDAD33D8994B40, 0x48EAD5FC5D0BE774, 0xE3B8C8EE55B7B03C, 0x91A0226E649E42E9,
     0x900E3129E7BADD7B, 0x202A9EC5FAA3CCE8, 0x5B3402464E1C3DB6, 0x609F4E62A44C1059, 0x20D06CD26A8FBF5C,
   ];
-  constrain keccakf(perm_zero_output) == perm_one_output;
+  assert(keccakf(perm_zero_output) == perm_one_output);
 }

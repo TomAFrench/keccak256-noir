@@ -4,17 +4,17 @@ use crate::constants;
 // We merge these two functions as rho consists of a rotation of the bits within each lane and pi is a remapping of
 // the lane indices. We can then efficiently perform both of these steps simultaneously by writing the output of rho
 // directly into the remapped lane specified by pi.
-fn rhoPi(state: [u64; constants::NUM_LANES]) -> [u64; constants::NUM_LANES] {
+pub fn rhoPi(state: [u64; constants::NUM_LANES]) -> [u64; constants::NUM_LANES] {
     // These are precomputed pairs of indices within the state array which specify how to perform the pi mapping.
     // Lanes are remapped such that the lane sitting at index READ_LANE_OFFSETS[i] is remapped to WRITE_LANE_OFFSETS[i].
-    let READ_LANE_OFFSETS: [comptime Field; 24] = [1, 10, 7, 11, 17, 18, 3, 5, 16, 8, 21, 24, 4, 15, 23, 19, 13, 12, 2, 20, 14, 22, 9, 6];
-    let WRITE_LANE_OFFSETS: [comptime Field; 24] = [10, 7, 11, 17, 18, 3, 5, 16, 8, 21, 24, 4, 15, 23, 19, 13, 12, 2, 20, 14, 22, 9, 6, 1];
+    let READ_LANE_OFFSETS: [ Field; 24] = [1, 10, 7, 11, 17, 18, 3, 5, 16, 8, 21, 24, 4, 15, 23, 19, 13, 12, 2, 20, 14, 22, 9, 6];
+    let WRITE_LANE_OFFSETS: [ Field; 24] = [10, 7, 11, 17, 18, 3, 5, 16, 8, 21, 24, 4, 15, 23, 19, 13, 12, 2, 20, 14, 22, 9, 6, 1];
 
     // This array defines the rho mapping to be applied to each lane.
     // Each lane is rotated by the specified number of bits, mapping the z coordinate as `z -> (z - T[i]) % LANE_LENGTH`
     // This array is defined as `T[i] = ((i+1)(i+2) / 2) % LANE_LENGTH`
     // This definition adds an additional modulo compared to the spec but makes it easier to calculate correct offsets.
-    let T: [comptime u64; 24] = [1, 3, 6, 10, 15, 21, 28, 36, 45, 55, 2, 14, 27, 41, 56, 8, 25, 43, 62, 18, 39, 61, 20, 44];
+    let T: [ u64; 24] = [1, 3, 6, 10, 15, 21, 28, 36, 45, 55, 2, 14, 27, 41, 56, 8, 25, 43, 62, 18, 39, 61, 20, 44];
 
     let mut new_state: [u64; constants::NUM_LANES] = [0; constants::NUM_LANES];
 
@@ -29,7 +29,7 @@ fn rhoPi(state: [u64; constants::NUM_LANES]) -> [u64; constants::NUM_LANES] {
     new_state
 }
 
-fn rotl64(num: u64, rot: comptime u64) -> u64 {
+fn rotl64(num: u64, rot:  u64) -> u64 {
   (num << rot) + (num >> (64 - rot))
 }
 
@@ -41,7 +41,7 @@ fn test_rhoPi(){
   
   // Round 0
   let round_zero_input: [u64; constants::NUM_LANES] = [0; constants::NUM_LANES];
-  constrain rhoPi(round_zero_input) == round_zero_input;
+  assert(rhoPi(round_zero_input) == round_zero_input);
 
   // Round 1
   let round_one_input = [
@@ -58,7 +58,7 @@ fn test_rhoPi(){
     0x0000000010000000, 0x0000000000000000, 0x0000000000000400, 0x0000000000000000, 0x0000000000000000,
     0x0000000000000000, 0x0000000000000000, 0x0000010000000000, 0x0000000000000000, 0x0000000000000004,
   ];
-  constrain rhoPi(round_one_input) == round_one_output;
+  assert(rhoPi(round_one_input) == round_one_output);
 
   // Round 2
   let round_two_input: [u64; constants::NUM_LANES] = [
@@ -75,5 +75,5 @@ fn test_rhoPi(){
     0x01800C5808000190, 0x0608404000070000, 0x000C0040063A2400, 0x3800101001030000, 0x0C00002100004184,
     0x80001C0008082181, 0x06000000800020C2, 0x0085808000110018, 0xC100080000E00020, 0x00000C0040063224,
   ];
-  constrain rhoPi(round_two_input) == round_two_output;
+  assert(rhoPi(round_two_input) == round_two_output);
 }

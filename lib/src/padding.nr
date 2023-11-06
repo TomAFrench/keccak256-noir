@@ -3,9 +3,9 @@ use crate::constants;
 // This is a simplified implementation of the pad10*1 algorithm.
 // As we assume that the input length is smaller than the block size, we can ignore the potential for the padding
 // sequence to be spread over multiple blocks.
-fn pad(input: [u64; constants::INPUT_SIZE], input_length: u64) -> [u64; constants::BLOCK_SIZE] {
+pub fn pad(input: [u64; constants::INPUT_SIZE], input_length: u64) -> [u64; constants::BLOCK_SIZE] {
   // We require 2 bits of space after the message in order to include the padding bits.
-  // constrain input_length < BLOCK_SIZE - 2;
+  // assert input_length < BLOCK_SIZE - 2;
 
 
   let mut padded_input: [u64; constants::BLOCK_SIZE] = [0; constants::BLOCK_SIZE];
@@ -29,7 +29,7 @@ fn pad(input: [u64; constants::INPUT_SIZE], input_length: u64) -> [u64; constant
       padded_input[i] = checked_bit_insert(word, bit_position);
     } else {
       // Input must be empty after end of message.
-      constrain word == 0;
+      assert(word == 0);
     }
   };
 
@@ -46,11 +46,11 @@ fn pad(input: [u64; constants::INPUT_SIZE], input_length: u64) -> [u64; constant
 }
 
 
-fn get_bit_mask(bit_position: Field) -> Field {
+pub fn get_bit_mask(bit_position: Field) -> Field {
   // We need to be able to map from a bit position in the range [0, 63] to a bitmask which pulls out
   // that particular bit from a u64.
-  // As we cannot perform bitshifts of non-comptime values then we must use a lookup table.
-  let bit_masks: [comptime Field; 64] = [
+  // As we cannot perform bitshifts of non- values then we must use a lookup table.
+  let bit_masks: [ Field; 64] = [
     0x8000000000000000, 0x4000000000000000, 0x2000000000000000, 0x1000000000000000,
     0x0800000000000000, 0x0400000000000000, 0x0200000000000000, 0x0100000000000000,
     0x0080000000000000, 0x0040000000000000, 0x0020000000000000, 0x0010000000000000,
@@ -85,19 +85,19 @@ fn checked_bit_insert(word: u64, bit_position: Field) -> u64 {
   let insert_bit_mask: Field = get_bit_mask(bit_position);
 
   let check_bit_mask = 2 * insert_bit_mask - 1;
-  constrain word & (check_bit_mask as u64) == 0;
+  assert(word & (check_bit_mask as u64) == 0);
 
   word | (insert_bit_mask as u64)
 }
 
 #[test]
 fn test_checked_bit_insert() {
-  constrain checked_bit_insert(0x0000000000000002, 63) == 0x0000000000000003;
-  constrain checked_bit_insert(0xf000000000000000, 4) == 0xf800000000000000;
+  assert(checked_bit_insert(0x0000000000000002, 63) == 0x0000000000000003);
+  assert(checked_bit_insert(0xf000000000000000, 4) == 0xf800000000000000);
 
   // Expected failures
-  // constrain checked_bit_insert(0xf000000000000001, 4) == 0xf800000000000001;
-  // constrain checked_bit_insert(0xf000000000000000, 0) == 0xf000000000000000;
+  // assert checked_bit_insert(0xf000000000000001, 4) == 0xf800000000000001;
+  // assert checked_bit_insert(0xf000000000000000, 0) == 0xf000000000000000;
 }
 
 #[test]
@@ -124,7 +124,7 @@ fn test_pad() {
       0x0000000000000000,
       0x0000000000000001
     ];
-    constrain pad(input, input_length) == expected_output;
+    assert(pad(input, input_length) == expected_output);
   }
 
   {
@@ -149,7 +149,7 @@ fn test_pad() {
       0x0000000000000000,
       0x8000000000000001
     ];
-    constrain pad(input, input_length) == expected_output;
+    assert(pad(input, input_length) == expected_output);
   }
 
   // {
@@ -176,6 +176,6 @@ fn test_pad() {
   //     0x0000000000000000,
   //     0x8000000000000001
   //   ];
-  //   constrain pad(input, input_length) == expected_output;
+  // assert(pad(input, input_length) == expected_output);
   // }
 }

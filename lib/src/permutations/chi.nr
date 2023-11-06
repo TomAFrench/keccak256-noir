@@ -1,6 +1,6 @@
 use crate::constants;
 
-fn chi(state: [u64; constants::NUM_LANES]) -> [u64; constants::NUM_LANES] {
+pub fn chi(state: [u64; constants::NUM_LANES]) -> [u64; constants::NUM_LANES] {
   let mut new_state = state;
 
   // The labelling convention for the state array is `Lane(x, y) = state[5y + x]`.
@@ -23,7 +23,7 @@ fn test_chi(){
   
   // Round 0
   let round_zero_input: [u64; constants::NUM_LANES] = [0; constants::NUM_LANES];
-  constrain chi(round_zero_input) == round_zero_input;
+  assert(chi(round_zero_input) == round_zero_input);
 
   // Round 1
   let round_one_input = [
@@ -40,7 +40,7 @@ fn test_chi(){
     0x0000000010000400, 0x0000000000000000, 0x0000000000000400, 0x0000000010000000, 0x0000000000000000,
     0x0000010000000000, 0x0000000000000000, 0x0000010000000004, 0x0000000000000000, 0x0000000000000004,
   ];
-  constrain chi(round_one_input) == round_one_output;
+  assert(chi(round_one_input) == round_one_output);
 
   // Round 2
   let round_two_input: [u64; constants::NUM_LANES] = [
@@ -57,5 +57,5 @@ fn test_chi(){
     0x01840C580E382590, 0x3E08505001060000, 0x040C0061063A6584, 0x39801C4809030010, 0x0A08402100074184,
     0x80859C8008192199, 0xC700080080E020E2, 0x008584804017321C, 0x4100180008E801A1, 0x06000C00C0063266,
   ];
-  constrain chi(round_two_input) == round_two_output;
+  assert(chi(round_two_input) == round_two_output);
 }

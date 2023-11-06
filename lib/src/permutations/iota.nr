@@ -1,8 +1,8 @@
 use crate::constants;
 
-fn iota(state: [u64; constants::NUM_LANES], round_number: comptime Field) -> [u64; constants::NUM_LANES] {
+pub fn iota(state: [u64; constants::NUM_LANES], round_number:  Field) -> [u64; constants::NUM_LANES] {
   // Each element of RC is a bitmap for the mask to apply to the lane.
-  let RC: [comptime u64; constants::NUM_ROUNDS] = [
+  let RC: [ u64; constants::NUM_ROUNDS] = [
         0x0000000000000001, 0x0000000000008082, 0x800000000000808A,
         0x8000000080008000, 0x000000000000808B, 0x0000000080000001,
         0x8000000080008081, 0x8000000000008009, 0x000000000000008A,
@@ -34,7 +34,7 @@ fn test_iota(){
     0x0000000000000000,0x0000000000000000,0x0000000000000000,0x0000000000000000,0x0000000000000000,
     0x0000000000000000,0x0000000000000000,0x0000000000000000,0x0000000000000000,0x0000000000000000
   ];
-  constrain iota(round_zero_input, 0) == round_zero_output;
+  assert(iota(round_zero_input, 0) == round_zero_output);
 
   // Round 1
   let round_one_input = [
@@ -51,7 +51,7 @@ fn test_iota(){
     0x0000000010000400, 0x0000000000000000, 0x0000000000000400, 0x0000000010000000, 0x0000000000000000,
     0x0000010000000000, 0x0000000000000000, 0x0000010000000004, 0x0000000000000000, 0x0000000000000004,
   ];
-  constrain iota(round_one_input, 1) == round_one_output;
+  assert(iota(round_one_input, 1) == round_one_output);
 
   // Round 2
   let round_two_input: [u64; constants::NUM_LANES] = [
@@ -68,5 +68,5 @@ fn test_iota(){
     0x01840C580E382590, 0x3E08505001060000, 0x040C0061063A6584, 0x39801C4809030010, 0x0A08402100074184,
     0x80859C8008192199, 0xC700080080E020E2, 0x008584804017321C, 0x4100180008E801A1, 0x06000C00C0063266,
   ];
-  constrain iota(round_two_input, 2) == round_two_output;
+  assert(iota(round_two_input, 2) == round_two_output);
 }
